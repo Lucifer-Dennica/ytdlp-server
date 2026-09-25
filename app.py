@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import yt_dlp
+import os
+import base64
 
 app = FastAPI()
 
@@ -22,13 +24,23 @@ async def resolve(req: Req):
             'noplaylist': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['android', 'web_safari', 'tv_embedded'],
+                    'player_client': ['web_creator', 'ios', 'mweb', 'tv_embedded', 'web_safari', 'android'],
+                    'player_skip': ['webpage', 'configs'],
                 }
             },
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36',
             },
         }
+
+        # Cookies через Base64 (если задана переменная)
+        cookies_b64 = os.environ.get("YTDLP_COOKIES_B64")
+        if cookies_b64:
+            cookies_path = "/tmp/cookies.txt"
+            with open(cookies_path, "wb") as f:
+                f.write(base64.b64decode(cookies_b64))
+            opts['cookiefile'] = cookies_path
+
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(req.url, download=False)
             video_url = info.get('url')
