@@ -24,7 +24,7 @@ async def resolve(req: Req):
             'noplaylist': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['web_creator', 'ios', 'mweb', 'tv_embedded', 'web_safari', 'android'],
+                    'player_client': ['tv', 'mweb'],
                     'player_skip': ['webpage', 'configs'],
                 }
             },
